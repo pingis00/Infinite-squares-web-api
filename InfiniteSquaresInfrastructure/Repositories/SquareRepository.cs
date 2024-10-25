@@ -1,7 +1,8 @@
-﻿using InfiniteSquaresCore.Models;
+﻿using InfiniteSquaresCore.Interfaces.Repositories;
+using InfiniteSquaresCore.Models;
 
 namespace InfiniteSquaresInfrastructure.Repositories;
 
-public class SquareRepository : BaseRepository<Square>
+public class SquareRepository : BaseRepository<Square>, ISquareRepository
 {
 }

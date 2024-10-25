@@ -1,20 +1,32 @@
+using InfiniteSquaresCore.Interfaces.Repositories;
+using InfiniteSquaresCore.Interfaces.Services;
+using InfiniteSquaresCore.Models;
+using InfiniteSquaresInfrastructure.Repositories;
+using InfiniteSquaresInfrastructure.Services;
 using InfiniteSquaresWebAPI.Configurations;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
 
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.RegisterSwagger();
+builder.Services.RegisterServices(builder.Configuration);
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "Infinite Squares API v1"));
+
 
 app.UseHttpsRedirection();
 
