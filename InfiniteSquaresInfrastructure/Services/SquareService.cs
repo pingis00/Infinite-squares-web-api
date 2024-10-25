@@ -1,5 +1,7 @@
-﻿namespace InfiniteSquaresInfrastructure.Services;
+﻿using InfiniteSquaresCore.Interfaces.Services;
 
-public class SquareService
+namespace InfiniteSquaresInfrastructure.Services;
+
+public class SquareService : ISquareService
 {
 }
