@@ -16,11 +16,11 @@ public class LoggerService(ILogger<LoggerService> logger) : ILoggerService
 
         if (ex == null)
         {
-            _logger.LogError(message);
+            _logger.LogError("Error: {Message}", message);
         }
         else
         {
-            _logger.LogError(ex, message);
+            _logger.LogError(ex, "Error: {Message}", message);
         }
     }
 
@@ -31,7 +31,7 @@ public class LoggerService(ILogger<LoggerService> logger) : ILoggerService
             throw new ArgumentException("Log message cannot be empty.", nameof(message));
         }
 
-        _logger.LogInformation(message);
+        _logger.LogInformation("Info: {Message}", message);
     }
 
     public void LogWarning(string message)
@@ -41,6 +41,6 @@ public class LoggerService(ILogger<LoggerService> logger) : ILoggerService
             throw new ArgumentException("Log message cannot be empty.", nameof(message));
         }
 
-        _logger.LogWarning(message);
+        _logger.LogWarning("Warning: {Message}", message);
     }
 }
