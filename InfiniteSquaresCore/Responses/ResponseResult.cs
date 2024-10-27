@@ -1,8 +1,14 @@
 ﻿namespace InfiniteSquaresCore.Responses;
 
-public class ResponseResult
+public class ResponseResult<T>(StatusCode status, T? data = default, string? message = null)
 {
-    public StatusCode Status { get; set; }
-    public object? ContentResult { get; set; }
-    public string? Message { get; set; }
+    public StatusCode Status { get; set; } = status;
+    public T? Data { get; set; } = data;
+    public string? Message { get; set; } = message;
+}
+
+public class ResponseResult(StatusCode status, string? message)
+{
+    public StatusCode Status { get; set; } = status;
+    public string? Message { get; set; } = message;
 }
