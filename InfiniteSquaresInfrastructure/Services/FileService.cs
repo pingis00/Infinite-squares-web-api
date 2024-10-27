@@ -20,9 +20,12 @@ public class FileService(ILoggerService logger) : IFileService
             }
 
             var jsonData = JsonConvert.SerializeObject(data, Formatting.Indented);
+            var fileExists = File.Exists(filePath);
             await File.WriteAllTextAsync(filePath, jsonData, Encoding.UTF8);
-            _logger.LogInfo($"File saved successfully at {filePath}");
-            return ResponseFactory.Ok("File saved successfully.");
+
+            var message = fileExists ? "File updated successfully." : "File saved successfully.";
+            _logger.LogInfo($"{message} at {filePath}");
+            return ResponseFactory.Ok(message);
         }
         catch (Exception ex)
         {
@@ -31,64 +34,64 @@ public class FileService(ILoggerService logger) : IFileService
         }
     }
 
-    public async Task<ResponseResult> ReadFromFileAsync<T>(string filepath)
+    public async Task<ResponseResult> ReadFromFileAsync<T>(string filePath)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(filepath))
+            if (string.IsNullOrWhiteSpace(filePath))
             {
                 _logger.LogWarning("File path is null or empty.");
                 return ResponseFactory.BadRequest("File path cannot be empty.");
             }
 
-            if (!File.Exists(filepath))
+            if (!File.Exists(filePath))
             {
-                _logger.LogWarning($"File not found at {filepath}");
-                return ResponseFactory.NotFound($"File not found at {filepath}");
+                _logger.LogWarning($"File not found at {filePath}");
+                return ResponseFactory.NotFound($"File not found at {filePath}");
             }
 
-            var jsonData = await File.ReadAllTextAsync(filepath, Encoding.UTF8);
+            var jsonData = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
             var data = JsonConvert.DeserializeObject<T>(jsonData);
 
             if (data == null)
             {
-                _logger.LogWarning($"Failed to deserialize data from file at {filepath}");
+                _logger.LogWarning($"Failed to deserialize data from file at {filePath}");
                 return ResponseFactory.InternalServerError("Failed to deserialize data.");
             }
 
-            _logger.LogInfo($"File read successfully at {filepath}");
+            _logger.LogInfo($"File read successfully at {filePath}");
             return ResponseFactory.Ok(data, "File read successfully.");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Failed to read file from {filepath}.", ex);
+            _logger.LogError($"Failed to read file from {filePath}.", ex);
             return ResponseFactory.InternalServerError($"Failed to read file: {ex.Message}");
         }
     }
 
-    public async Task<ResponseResult> DeleteFileAsync(string filepath)
+    public async Task<ResponseResult> DeleteFileAsync(string filePath)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(filepath))
+            if (string.IsNullOrWhiteSpace(filePath))
             {
                 _logger.LogWarning("File path is null or empty.");
                 return ResponseFactory.BadRequest("File path cannot be empty.");
             }
 
-            if (!File.Exists(filepath))
+            if (!File.Exists(filePath))
             {
-                _logger.LogWarning($"File not found for deletion: {filepath}");
-                return ResponseFactory.NotFound($"File not found at {filepath}");
+                _logger.LogWarning($"File not found for deletion: {filePath}");
+                return ResponseFactory.NotFound($"File not found at {filePath}");
             }
 
-            File.Delete(filepath);
-            _logger.LogInfo($"File deleted successfully at {filepath}");
+            File.Delete(filePath);
+            _logger.LogInfo($"File deleted successfully at {filePath}");
             return ResponseFactory.Ok("File deleted successfully.");
         }
         catch (Exception ex)
         {
-            _logger.LogError($"Failed to delete file at {filepath}.", ex);
+            _logger.LogError($"Failed to delete file at {filePath}.", ex);
             return ResponseFactory.InternalServerError($"Failed to delete file: {ex.Message}");
         }
     }

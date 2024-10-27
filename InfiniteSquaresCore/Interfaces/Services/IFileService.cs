@@ -4,7 +4,7 @@ namespace InfiniteSquaresCore.Interfaces.Services;
 
 public interface IFileService
 {
-    Task<ResponseResult> SaveFileAsync<T>(string filepath, T data);
-    Task<ResponseResult> ReadFromFileAsync<T>(string filepath);
-    Task<ResponseResult> DeleteFileAsync(string filepath);
+    Task<ResponseResult> SaveFileAsync<T>(string filePath, T data);
+    Task<ResponseResult> ReadFromFileAsync<T>(string filePath);
+    Task<ResponseResult> DeleteFileAsync(string filePath);
 }
