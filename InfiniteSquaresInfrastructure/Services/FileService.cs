@@ -23,9 +23,16 @@ public class FileService(ILoggerService logger) : IFileService
             var fileExists = File.Exists(filePath);
             await File.WriteAllTextAsync(filePath, jsonData, Encoding.UTF8);
 
-            var message = fileExists ? "File updated successfully." : "File saved successfully.";
-            _logger.LogInfo($"{message} at {filePath}");
-            return ResponseFactory.Ok(message);
+            if (fileExists)
+            {
+                _logger.LogInfo($"File updated successfully at {filePath}");
+                return ResponseFactory.Ok("File updated successfully.");
+            }
+            else
+            {
+                _logger.LogInfo($"File created successfully at {filePath}");
+                return ResponseFactory.Created("File created successfully.");
+            }
         }
         catch (Exception ex)
         {
@@ -34,20 +41,20 @@ public class FileService(ILoggerService logger) : IFileService
         }
     }
 
-    public async Task<ResponseResult> ReadFromFileAsync<T>(string filePath)
+    public async Task<ResponseResult<T>> ReadFromFileAsync<T>(string filePath)
     {
         try
         {
             if (string.IsNullOrWhiteSpace(filePath))
             {
                 _logger.LogWarning("File path is null or empty.");
-                return ResponseFactory.BadRequest("File path cannot be empty.");
+                return ResponseFactoryGenerics<T>.BadRequest("File path cannot be empty");
             }
 
             if (!File.Exists(filePath))
             {
                 _logger.LogWarning($"File not found at {filePath}");
-                return ResponseFactory.NotFound($"File not found at {filePath}");
+                return ResponseFactoryGenerics<T>.NotFound("File not found");
             }
 
             var jsonData = await File.ReadAllTextAsync(filePath, Encoding.UTF8);
@@ -56,16 +63,16 @@ public class FileService(ILoggerService logger) : IFileService
             if (data == null)
             {
                 _logger.LogWarning($"Failed to deserialize data from file at {filePath}");
-                return ResponseFactory.InternalServerError("Failed to deserialize data.");
+                return ResponseFactoryGenerics<T>.InternalServerError("Failed to deserialize data");
             }
 
             _logger.LogInfo($"File read successfully at {filePath}");
-            return ResponseFactory.Ok(data, "File read successfully.");
+            return ResponseFactoryGenerics<T>.Ok(data, "File read successfully");
         }
         catch (Exception ex)
         {
             _logger.LogError($"Failed to read file from {filePath}.", ex);
-            return ResponseFactory.InternalServerError($"Failed to read file: {ex.Message}");
+            return ResponseFactoryGenerics<T>.InternalServerError($"Failed to read file: {ex.Message}");
         }
     }
 
