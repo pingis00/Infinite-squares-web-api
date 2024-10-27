@@ -1,8 +1,3 @@
-using InfiniteSquaresCore.Interfaces.Repositories;
-using InfiniteSquaresCore.Interfaces.Services;
-using InfiniteSquaresCore.Models;
-using InfiniteSquaresInfrastructure.Repositories;
-using InfiniteSquaresInfrastructure.Services;
 using InfiniteSquaresWebAPI.Configurations;
 using Serilog;
 
