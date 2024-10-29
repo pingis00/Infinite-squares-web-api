@@ -37,7 +37,7 @@ public class FileService(ILoggerService logger) : IFileService
         catch (Exception ex)
         {
             _logger.LogError($"Failed to save file at {filePath}.", ex);
-            return ResponseFactory.InternalServerError($"Failed to save file: {ex.Message}");
+            return ResponseFactory.Error($"Failed to save file: {ex.Message}");
         }
     }
 
