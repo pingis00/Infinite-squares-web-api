@@ -17,17 +17,13 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
     {
         try
         {
-            if (entity == null)
-            {
-                _logger.LogError("Failed to read existing squares from file at {FilePath}.", _filePath);
-                return ResponseFactory.BadRequest("Square entity cannot be null.");
-            }
+            ArgumentNullException.ThrowIfNull(entity);
 
             var existingSquaresResult = await _fileService.ReadFromFileAsync<List<Square>>(_filePath);
 
-            if (existingSquaresResult.Status != StatusCode.OK && existingSquaresResult.Status != StatusCode.NOT_FOUND)
+            if (!IsSuccessOrNotFound(existingSquaresResult.Status))
             {
-                _logger.LogError("Failed to read existing squares from file at {filePath}", _filePath);
+                _logger.LogError("Failed to read existing squares from file at {FilePath}", _filePath);
                 return ResponseFactory.Error("Failed to read existing squares.");
             }
 
@@ -37,16 +33,9 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
 
             var saveResult = await _fileService.SaveFileAsync(_filePath, squares);
 
-            if (saveResult.Status == StatusCode.CREATED)
-            {
-                _logger.LogInformation("Square created and file saved successfully at {filePath}", _filePath);
-                return ResponseFactory.Created("Square created and file saved successfully.");
-            }
-            else
-            {
-                _logger.LogInformation("Square added to existing file successfully at {filePath}", _filePath);
-                return ResponseFactory.Ok("Square added to existing file successfully.");
-            }
+            return saveResult.Status == StatusCode.CREATED
+                ? ResponseFactory.Created("Square created successfully.")
+                : ResponseFactory.Ok("Square added successfully.");
 
         }
         catch (Exception ex)
@@ -62,20 +51,12 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
         {
             var result = await _fileService.ReadFromFileAsync<List<Square>>(_filePath);
 
-            if (result.Status == StatusCode.NOT_FOUND)
+            return result.Status switch
             {
-                _logger.LogWarning("No squares found at {filePath}", _filePath);
-                return ResponseFactoryGenerics<IEnumerable<Square>>.NotFound("No squares found.");
-            }
-
-            if (result.Status != StatusCode.OK)
-            {
-                _logger.LogError("Failed to retrieve squares from file at {filePath}", _filePath);
-                return ResponseFactoryGenerics<IEnumerable<Square>>.Error("Failed to retrieve squares.");
-            }
-
-            var squares = result.Data ?? [];
-            return ResponseFactoryGenerics<IEnumerable<Square>>.Ok(squares);
+                StatusCode.NOT_FOUND => ResponseFactoryGenerics<IEnumerable<Square>>.NotFound("No squares found."),
+                StatusCode.OK => ResponseFactoryGenerics<IEnumerable<Square>>.Ok(result.Data ?? []),
+                _ => ResponseFactoryGenerics<IEnumerable<Square>>.Error("Failed to retrieve squares.")
+            };
         }
         catch (Exception ex)
         {
@@ -90,14 +71,9 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
         {
             var deleteResult = await _fileService.DeleteFileAsync(_filePath);
 
-            if (deleteResult.Status != StatusCode.OK)
-            {
-                _logger.LogError("Failed to delete squares from file at {filePath}", _filePath);
-                return ResponseFactory.Error("Failed to delete squares.");
-            }
-
-            _logger.LogInformation("All squares deleted successfully from file at {filePath}", _filePath);
-            return ResponseFactory.Ok("All squares deleted successfully.");
+            return deleteResult.Status == StatusCode.OK
+                ? ResponseFactory.Ok("All squares deleted successfully.")
+                : ResponseFactory.Error("Failed to delete squares.");
         }
         catch (Exception ex)
         {
@@ -105,4 +81,7 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
             return ResponseFactory.Error("Failed to delete square.");
         }
     }
+
+    private static bool IsSuccessOrNotFound(StatusCode status) =>
+    status is StatusCode.OK or StatusCode.NOT_FOUND;
 }
