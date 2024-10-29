@@ -4,29 +4,43 @@ using InfiniteSquaresCore.Interfaces.Services;
 using InfiniteSquaresCore.Models;
 using InfiniteSquaresInfrastructure.Repositories;
 using InfiniteSquaresInfrastructure.Services;
-using InfiniteSquaresWebAPI.Interface;
-using InfiniteSquaresWebAPI.Service;
 
 namespace InfiniteSquaresWebAPI.Configurations;
 
 public static class ServiceConfiguration
 {
-    public static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var squareFilePath = configuration.GetValue<string>("FileSettings:SquareFilePath");
-
-        if (string.IsNullOrWhiteSpace(squareFilePath))
-        {
-            throw new InvalidOperationException("Square file path is not configured properly.");
-        }
-
+        // File path configuration
+        var squareFilePath = configuration.GetValue<string>("FileSettings:SquareFilePath")
+            ?? throw new InvalidOperationException("Square file path is not configured.");
         services.AddSingleton(new FileSettings { SquareFilePath = squareFilePath });
 
-        services.AddScoped<IFileService, FileService>();
-        services.AddScoped<ILoggerService, LoggerService>();
-        services.AddScoped<IMappingService, MappingService>();
-        services.AddScoped<ISquareService, SquareService>();
-        services.AddScoped<IBaseRepository<Square>, BaseRepository<Square>>();
-        services.AddScoped<ISquareRepository, SquareRepository>();
+        // ASP.NET Core services
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen();
+
+        // CORS configuration
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAllOrigins",
+                policy => policy
+                    .AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader());
+        });
+
+        // Repository registrations
+        services.AddScoped<IBaseRepository<Square>, BaseRepository<Square>>()
+        .AddScoped<ISquareRepository, SquareRepository>();
+
+        // Service registrations
+        services.AddScoped<IFileService, FileService>()
+                .AddScoped<ILoggerService, LoggerService>()
+                .AddScoped<IMappingService, MappingService>()
+                .AddScoped<ISquareService, SquareService>();
+
+        return services;
     }
 }
