@@ -1,6 +1,6 @@
 ﻿using InfiniteSquaresCore.Interfaces.Services;
 using InfiniteSquaresWebAPI.DTOs;
-using InfiniteSquaresWebAPI.Interface;
+using InfiniteSquaresWebAPI.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using static InfiniteSquaresCore.Responses.StatusCode;
 
