@@ -23,20 +23,14 @@ namespace InfiniteSquaresWebAPI.Controllers
                 var square = _mappingService.MapToEntity(squareDto);
                 var result = await _squaresService.CreateSquareAsync(square);
 
-                if (result.Status == INTERNAL_SERVER_ERROR)
+                if (result.Status == CREATED || result.Status == OK)
                 {
-                    _logger.LogError("Failed to create square: {Message}", result.Message);
-                    return StatusCode((int)result.Status, result.Message);
+                    _logger.LogInformation("Square created successfully.");
+                    return CreatedAtAction(nameof(GetAllSquares), new { id = square.Id }, squareDto);
                 }
 
-                if (result.Status != CREATED && result.Status != OK)
-                {
-                    _logger.LogWarning("Unexpected status when creating square: {Status}", result.Status);
-                    return StatusCode((int)result.Status, result.Message);
-                }
-
-                _logger.LogInformation("Square created successfully.");
-                return CreatedAtAction(nameof(GetAllSquares), new { id = square.Id }, squareDto);
+                _logger.LogError("Failed to create square: {Message}", result.Message);
+                return StatusCode((int)result.Status, result.Message);
             }
             catch (Exception ex)
             {
@@ -51,31 +45,17 @@ namespace InfiniteSquaresWebAPI.Controllers
             try
             {
                 _logger.LogInformation("Retrieving all squares.");
-
                 var result = await _squaresService.GetAllSquaresAsync();
 
-                if (result.Status == NOT_FOUND)
+                if (result.Data == null || !result.Data.Any())
                 {
-                    _logger.LogWarning("No squares found.");
-                    return NotFound(result.Message);
-                }
-                if (result.Status != OK)
-                {
-                    _logger.LogError("Failed to retrieve squares: {Message}", result.Message);
-                    return StatusCode((int)result.Status, result.Message);
+                    _logger.LogInformation("No squares found, returning empty list.");
+                    return Ok(new List<SquareDto>());
                 }
 
-                if (result.Data != null)
-                {
-                    var squareDtos = result.Data.Select(_mappingService.MapToDto);
-                    _logger.LogInformation("Retrieved all squares successfully.");
-                    return Ok(squareDtos);
-                }
-                else
-                {
-                    _logger.LogWarning("No squares found.");
-                    return NotFound("No squares found.");
-                }
+                var squareDtos = result.Data.Select(_mappingService.MapToDto);
+                _logger.LogInformation("Retrieved all squares successfully.");
+                return Ok(squareDtos);
             }
             catch (Exception ex)
             {
@@ -95,8 +75,8 @@ namespace InfiniteSquaresWebAPI.Controllers
 
                 if (result.Status == NOT_FOUND)
                 {
-                    _logger.LogWarning("No squares found to delete.");
-                    return NotFound(result.Message);
+                    _logger.LogInformation("No squares found to delete, returning success.");
+                    return Ok("No squares to delete.");
                 }
                 if (result.Status != OK)
                 {
