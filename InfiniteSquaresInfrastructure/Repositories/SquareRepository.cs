@@ -1,4 +1,5 @@
-﻿using InfiniteSquaresCore.Interfaces.Repositories;
+﻿using InfiniteSquaresCore.Configurations;
+using InfiniteSquaresCore.Interfaces.Repositories;
 using InfiniteSquaresCore.Interfaces.Services;
 using InfiniteSquaresCore.Models;
 using InfiniteSquaresCore.Responses;
@@ -6,11 +7,11 @@ using Microsoft.Extensions.Logging;
 
 namespace InfiniteSquaresInfrastructure.Repositories;
 
-public class SquareRepository(IFileService fileService, ILogger<SquareRepository> logger, string filePath) : ISquareRepository
+public class SquareRepository(IFileService fileService, ILogger<SquareRepository> logger, FileSettings fileSettings) : ISquareRepository
 {
     private readonly IFileService _fileService = fileService;
     private readonly ILogger<SquareRepository> _logger = logger;
-    private readonly string _filePath = filePath;
+    private readonly string _filePath = fileSettings.SquareFilePath;
 
     public async Task<ResponseResult> CreateAsync(Square entity)
     {
