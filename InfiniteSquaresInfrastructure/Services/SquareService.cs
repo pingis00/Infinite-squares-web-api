@@ -39,7 +39,7 @@ public class SquareService(ISquareRepository squareRepository, ILogger<SquareSer
             if (result.Status != StatusCode.OK)
             {
                 _logger.LogError("Failed to retrieve squares.");
-                return ResponseFactoryGenerics<IEnumerable<Square>>.InternalServerError("Failed to retrieve squares.");
+                return ResponseFactoryGenerics<IEnumerable<Square>>.Error("Failed to retrieve squares.");
             }
             _logger.LogInformation("Retrieved all squares successfully.");
             return result;
@@ -47,7 +47,7 @@ public class SquareService(ISquareRepository squareRepository, ILogger<SquareSer
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving squares.");
-            return ResponseFactoryGenerics<IEnumerable<Square>>.InternalServerError("Error retrieving squares.");
+            return ResponseFactoryGenerics<IEnumerable<Square>>.Error("Error retrieving squares.");
         }
     }
 
@@ -59,7 +59,7 @@ public class SquareService(ISquareRepository squareRepository, ILogger<SquareSer
             if (result.Status != StatusCode.OK)
             {
                 _logger.LogError("Failed to delete all squares.");
-                return ResponseFactory.InternalServerError("Failed to delete squares.");
+                return ResponseFactory.Error("Failed to delete squares.");
             }
             _logger.LogInformation("All squares deleted successfully.");
             return ResponseFactory.Ok("All squares deleted successfully.");
@@ -67,7 +67,7 @@ public class SquareService(ISquareRepository squareRepository, ILogger<SquareSer
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting all squares.");
-            return ResponseFactory.InternalServerError("Error deleting squares.");
+            return ResponseFactory.Error("Error deleting squares.");
         }
     }
 }

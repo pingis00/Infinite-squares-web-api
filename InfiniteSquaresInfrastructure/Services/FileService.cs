@@ -63,7 +63,7 @@ public class FileService(ILoggerService logger) : IFileService
             if (data == null)
             {
                 _logger.LogWarning($"Failed to deserialize data from file at {filePath}");
-                return ResponseFactoryGenerics<T>.InternalServerError("Failed to deserialize data");
+                return ResponseFactoryGenerics<T>.Error("Failed to deserialize data");
             }
 
             _logger.LogInfo($"File read successfully at {filePath}");
@@ -72,7 +72,7 @@ public class FileService(ILoggerService logger) : IFileService
         catch (Exception ex)
         {
             _logger.LogError($"Failed to read file from {filePath}.", ex);
-            return ResponseFactoryGenerics<T>.InternalServerError($"Failed to read file: {ex.Message}");
+            return ResponseFactoryGenerics<T>.Error($"Failed to read file: {ex.Message}");
         }
     }
 
@@ -99,7 +99,7 @@ public class FileService(ILoggerService logger) : IFileService
         catch (Exception ex)
         {
             _logger.LogError($"Failed to delete file at {filePath}.", ex);
-            return ResponseFactory.InternalServerError($"Failed to delete file: {ex.Message}");
+            return ResponseFactory.Error($"Failed to delete file: {ex.Message}");
         }
     }
 }
