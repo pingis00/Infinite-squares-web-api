@@ -4,6 +4,8 @@ using InfiniteSquaresCore.Interfaces.Services;
 using InfiniteSquaresCore.Models;
 using InfiniteSquaresInfrastructure.Repositories;
 using InfiniteSquaresInfrastructure.Services;
+using InfiniteSquaresWebAPI.Interface;
+using InfiniteSquaresWebAPI.Service;
 
 namespace InfiniteSquaresWebAPI.Configurations;
 

@@ -1,5 +1,6 @@
 ﻿using InfiniteSquaresCore.Interfaces.Services;
 using InfiniteSquaresWebAPI.DTOs;
+using InfiniteSquaresWebAPI.Interface;
 using Microsoft.AspNetCore.Mvc;
 using static InfiniteSquaresCore.Responses.StatusCode;
 
@@ -7,23 +8,33 @@ namespace InfiniteSquaresWebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class SquaresController(ISquareService squaresService, IMappingService mappingService, ILogger<SquaresController> logger) : ControllerBase
+    public class SquaresController(
+        ISquareService squaresService, 
+        IMappingService mappingService, 
+        ILogger<SquaresController> logger) : ControllerBase
     {
         private readonly ISquareService _squaresService = squaresService;
         private readonly IMappingService _mappingService = mappingService;
         private readonly ILogger<SquaresController> _logger = logger;
 
+        private const string UnexpectedError = "An unexpected error occurred.";
+
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateSquare([FromBody] SquareDto squareDto)
         {
             try
             {
-                _logger.LogInformation("Creating a new square.");
+                ArgumentNullException.ThrowIfNull(squareDto);
+
+                _logger.LogInformation("Creating new square at position ({Row}, {Column})", squareDto.Row, squareDto.Column);
 
                 var square = _mappingService.MapToEntity(squareDto);
                 var result = await _squaresService.CreateSquareAsync(square);
 
-                if (result.Status == CREATED || result.Status == OK)
+                if (result.Status is CREATED or OK)
                 {
                     _logger.LogInformation("Square created successfully.");
                     return CreatedAtAction(nameof(GetAllSquares), new { id = square.Id }, squareDto);
@@ -34,13 +45,15 @@ namespace InfiniteSquaresWebAPI.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while creating the square.");
-                return StatusCode(500, "An unexpected error occurred.");
+                _logger.LogError(ex, "Error creating square at position ({Row}, {Column})", squareDto?.Row, squareDto?.Column);
+                return StatusCode(500, UnexpectedError);
             }
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllSquares()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<SquareDto>>> GetAllSquares()
         {
             try
             {
@@ -54,17 +67,19 @@ namespace InfiniteSquaresWebAPI.Controllers
                 }
 
                 var squareDtos = result.Data.Select(_mappingService.MapToDto);
-                _logger.LogInformation("Retrieved all squares successfully.");
+                _logger.LogInformation("Retrieved {Count} squares successfully", squareDtos.Count());
                 return Ok(squareDtos);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while retrieving squares.");
-                return StatusCode(500, "An unexpected error occurred.");
+                _logger.LogError(ex, "Error retrieving squares");
+                return StatusCode(500, UnexpectedError);
             }
         }
 
         [HttpDelete]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteAllSquares()
         {
             try
@@ -75,22 +90,22 @@ namespace InfiniteSquaresWebAPI.Controllers
 
                 if (result.Status == NOT_FOUND)
                 {
-                    _logger.LogInformation("No squares found to delete, returning success.");
+                    _logger.LogInformation("No squares found to delete");
                     return Ok("No squares to delete.");
                 }
-                if (result.Status != OK)
+                if (result.Status == OK)
                 {
-                    _logger.LogError("Failed to delete squares: {Message}", result.Message);
-                    return StatusCode((int)result.Status, result.Message);
+                    _logger.LogInformation("All squares deleted successfully");
+                    return Ok("All squares deleted successfully.");
                 }
 
-                _logger.LogInformation("All squares deleted successfully.");
-                return Ok("All squares deleted successfully.");
+                _logger.LogError("Failed to delete squares: {Message}", result.Message);
+                return StatusCode((int)result.Status, result.Message);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while deleting squares.");
-                return StatusCode(500, "An unexpected error occurred.");
+                _logger.LogError(ex, "Error deleting squares");
+                return StatusCode(500, UnexpectedError);
             }
         }
     }

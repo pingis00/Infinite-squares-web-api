@@ -1,9 +1,8 @@
-﻿using InfiniteSquaresCore.Interfaces.Services;
-using InfiniteSquaresCore.Models;
+﻿using InfiniteSquaresCore.Models;
 using InfiniteSquaresWebAPI.DTOs;
-using System.Drawing;
+using InfiniteSquaresWebAPI.Interface;
 
-namespace InfiniteSquaresInfrastructure.Services;
+namespace InfiniteSquaresWebAPI.Service;
 
 public class MappingService : IMappingService
 {
