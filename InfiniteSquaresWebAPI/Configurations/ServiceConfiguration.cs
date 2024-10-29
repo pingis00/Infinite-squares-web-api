@@ -6,6 +6,7 @@ using InfiniteSquaresInfrastructure.Repositories;
 using InfiniteSquaresInfrastructure.Services;
 using InfiniteSquaresWebAPI.Interfaces;
 using InfiniteSquaresWebAPI.Services;
+using Microsoft.Extensions.Options;
 
 namespace InfiniteSquaresWebAPI.Configurations;
 
@@ -16,7 +17,9 @@ public static class ServiceConfiguration
         // File path configuration
         var squareFilePath = configuration.GetValue<string>("FileSettings:SquareFilePath")
             ?? throw new InvalidOperationException("Square file path is not configured.");
+
         services.AddSingleton(new FileSettings { SquareFilePath = squareFilePath });
+        services.AddSingleton<IValidateOptions<FileSettings>, FileSettingsValidator>();
 
         // ASP.NET Core services
         services.AddControllers();
