@@ -1,7 +1,7 @@
 ﻿using InfiniteSquaresCore.Models;
 using InfiniteSquaresWebAPI.DTOs;
 
-namespace InfiniteSquaresCore.Interfaces.Services;
+namespace InfiniteSquaresWebAPI.Interface;
 
 public interface IMappingService
 {
