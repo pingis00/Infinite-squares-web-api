@@ -4,11 +4,18 @@ namespace InfiniteSquaresWebAPI.Configurations;
 
 public static class SwaggerConfiguration
 {
-    public static void RegisterSwagger(this IServiceCollection services)
+    public static IServiceCollection RegisterSwagger(this IServiceCollection services)
     {
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "InfiniteSquaresWebAPI", Version = "v1" });
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Infinite Squares API",
+                Version = "v1",
+                Description = "API for managing infinite squares application"
+            });
         });
+
+        return services;
     }
 }
