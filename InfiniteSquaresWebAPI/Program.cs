@@ -1,4 +1,5 @@
 using InfiniteSquaresWebAPI.Configurations;
+using InfiniteSquaresWebAPI.Middleware;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,6 +19,7 @@ builder.Services.RegisterServices(builder.Configuration);
 var app = builder.Build();
 
 // Configure middleware pipeline
+app.UseExceptionHandling();
 app.UseCors("AllowAllOrigins");
 app.UseSwagger();
 app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "Infinite Squares API v1"));
