@@ -16,18 +16,20 @@ public class SquareService(ISquareRepository squareRepository, ILogger<SquareSer
         try
         {
             var result = await _squareRepository.CreateAsync(square);
-            if (result.Status != StatusCode.CREATED && result.Status != StatusCode.OK)
+
+            if (!IsSuccessful(result.Status))
             {
-                _logger.LogError("Failed to create square with ID {SquareId}.", square.Id);
-                return ResponseFactory.InternalServerError("Failed to create square.");
+                _logger.LogError("Failed to create square at position ({Row}, {Column})", square.Row, square.Column);
+                return ResponseFactory.Error("Failed to create square");
             }
-            _logger.LogInformation("Square with ID {SquareId} created successfully.", square.Id);
+
+            _logger.LogInformation("Square created successfully at position ({Row}, {Column})", square.Row, square.Column);
             return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error creating square with ID {SquareId}.", square.Id);
-            return ResponseFactory.InternalServerError("Error creating square.");
+            _logger.LogError(ex, "Error creating square at position ({Row}, {Column})", square.Row, square.Column);
+            return ResponseFactory.Error("Error creating square");
         }
     }
 
@@ -70,4 +72,7 @@ public class SquareService(ISquareRepository squareRepository, ILogger<SquareSer
             return ResponseFactory.Error("Error deleting squares.");
         }
     }
+
+    private static bool IsSuccessful(StatusCode status) =>
+    status is StatusCode.CREATED or StatusCode.OK;
 }
