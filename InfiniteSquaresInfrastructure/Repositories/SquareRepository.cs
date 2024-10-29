@@ -28,7 +28,7 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
             if (existingSquaresResult.Status != StatusCode.OK && existingSquaresResult.Status != StatusCode.NOT_FOUND)
             {
                 _logger.LogError("Failed to read existing squares from file at {filePath}", _filePath);
-                return ResponseFactory.InternalServerError("Failed to read existing squares.");
+                return ResponseFactory.Error("Failed to read existing squares.");
             }
 
             var squares = existingSquaresResult.Data ?? [];
@@ -52,7 +52,7 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error creating square at {filePath}", _filePath);
-            return ResponseFactory.InternalServerError("Failed to create square.");
+            return ResponseFactory.Error("Failed to create square.");
         }
     }
 
@@ -71,7 +71,7 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
             if (result.Status != StatusCode.OK)
             {
                 _logger.LogError("Failed to retrieve squares from file at {filePath}", _filePath);
-                return ResponseFactoryGenerics<IEnumerable<Square>>.InternalServerError("Failed to retrieve squares.");
+                return ResponseFactoryGenerics<IEnumerable<Square>>.Error("Failed to retrieve squares.");
             }
 
             var squares = result.Data ?? [];
@@ -80,7 +80,7 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving squares from file at {filePath}", _filePath);
-            return ResponseFactoryGenerics<IEnumerable<Square>>.InternalServerError("Failed to retrieve squares.");
+            return ResponseFactoryGenerics<IEnumerable<Square>>.Error("Failed to retrieve squares.");
         }
     }
 
@@ -93,7 +93,7 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
             if (deleteResult.Status != StatusCode.OK)
             {
                 _logger.LogError("Failed to delete squares from file at {filePath}", _filePath);
-                return ResponseFactory.InternalServerError("Failed to delete squares.");
+                return ResponseFactory.Error("Failed to delete squares.");
             }
 
             _logger.LogInformation("All squares deleted successfully from file at {filePath}", _filePath);
@@ -102,7 +102,7 @@ public class SquareRepository(IFileService fileService, ILogger<SquareRepository
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error deleting squares from file at {filePath}", _filePath);
-            return ResponseFactory.InternalServerError("Failed to delete square.");
+            return ResponseFactory.Error("Failed to delete square.");
         }
     }
 }
