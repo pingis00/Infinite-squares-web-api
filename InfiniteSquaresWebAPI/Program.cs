@@ -14,10 +14,12 @@ Log.Logger = new LoggerConfiguration()
 // Register services
 builder.Services.RegisterSwagger();
 builder.Services.RegisterServices(builder.Configuration);
+builder.Services.AddApiConfigurations();
 
 var app = builder.Build();
 
 // Configure middleware pipeline
+app.UseCustomMiddleware();
 app.UseCors("AllowAllOrigins");
 app.UseSwagger();
 app.UseSwaggerUI(x => x.SwaggerEndpoint("/swagger/v1/swagger.json", "Infinite Squares API v1"));
