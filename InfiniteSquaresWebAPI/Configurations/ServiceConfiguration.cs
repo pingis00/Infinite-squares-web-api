@@ -4,6 +4,8 @@ using InfiniteSquaresCore.Interfaces.Services;
 using InfiniteSquaresCore.Models;
 using InfiniteSquaresInfrastructure.Repositories;
 using InfiniteSquaresInfrastructure.Services;
+using InfiniteSquaresWebAPI.Interfaces;
+using InfiniteSquaresWebAPI.Services;
 
 namespace InfiniteSquaresWebAPI.Configurations;
 
@@ -38,8 +40,8 @@ public static class ServiceConfiguration
         // Service registrations
         services.AddScoped<IFileService, FileService>()
                 .AddScoped<ILoggerService, LoggerService>()
-                .AddScoped<IMappingService, MappingService>()
-                .AddScoped<ISquareService, SquareService>();
+                .AddScoped<ISquareService, SquareService>()
+                .AddScoped<IMappingService, MappingService>();
 
         return services;
     }
