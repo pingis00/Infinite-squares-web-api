@@ -21,7 +21,6 @@ public static class ServiceConfiguration
         // ASP.NET Core services
         services.AddControllers();
         services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen();
 
         // CORS configuration
         services.AddCors(options =>
